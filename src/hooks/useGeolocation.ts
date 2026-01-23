@@ -15,11 +15,9 @@ const useGeolocation = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-        navigator.permissions.query({ name: 'geolocation' })
-  .then((result) => {
-    console.log(result.state); // 'granted' | 'denied' | 'prompt'
-  });
+        // navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        //     console.log(result.state); // 'granted' | 'denied' | 'prompt'
+        // });
         if (!navigator.geolocation) {
             setError({
                 message: "Geolocation을 지원하지 않는 브라우저입니다.",
