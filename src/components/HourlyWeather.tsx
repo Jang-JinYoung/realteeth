@@ -54,25 +54,17 @@ const HourlyWeather = ({ houlyData }: IProps) => {
                         key={h.dt}
                         ref={isCurrentHour ? currentHourRef : null}
                         className="min-w-[72px] rounded-xl bg-slate-100
-                                       flex flex-col items-center py-3"
+                                       flex flex-col items-center py-3 bg-white"
                     >
                         <span className="text-sm font-semibold text-black">
                             {Math.round(h.temp)}°
                         </span>
 
-                        {hour > 18 || hour < 6 ? (
-                            <img
-                                src="https://openweathermap.org/img/wn/01n@2x.png"
-                                className="w-8 h-8 my-1"
-                                alt="night"
-                            />
-                        ) : (
-                            <img
-                                src="https://openweathermap.org/img/wn/01d@2x.png"
-                                className="w-8 h-8 my-1"
-                                alt="day"
-                            />
-                        )}
+                        <img
+                            src={`https://openweathermap.org/img/wn/${h.weather[0].icon}@2x.png`}
+                            className="w-10 h-10 my-1"
+                            alt={h.weather[0].description}
+                        />
 
                         <span className="text-xs text-slate-500">{hour}시</span>
                     </li>
