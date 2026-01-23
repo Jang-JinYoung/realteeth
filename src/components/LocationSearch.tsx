@@ -1,8 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import { districtData } from "../data/korea_districts";
-import { getLatLonByLocation } from "../api/weatherAPI";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Skeleton from "./Skeleton";
 
 interface IProps {
     locationSearchCallback: (locationName: string) => void;

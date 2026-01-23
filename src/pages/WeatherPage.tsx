@@ -97,7 +97,7 @@ const WeatherPage = () => {
                 lon: locationData[0].lon,
             });
         }
-    }, [locationData]);
+    }, [locationData, isLocationLoading, setPosition]);
 
     const locationSearchCallback = (locationName: string) => {
         // 지역이름
@@ -137,6 +137,8 @@ const WeatherPage = () => {
     if (useGeolocationError) return <div>위치 정보를 가져올 수 없습니다.</div>;
     if (!position) return <div>123</div>;
 
+
+    if (locationError) return <div>지역 검색 오류</div>
     if (error) return <div>Error: {error.message}</div>;
 
     return (

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { IHoulyWeather } from "../types/weatherType";
-import Skeleton from "./Skeleton";
 
 interface IProps {
     houlyData: IHoulyWeather[];
@@ -65,11 +64,13 @@ const HourlyWeather = ({ houlyData }: IProps) => {
                             <img
                                 src="https://openweathermap.org/img/wn/01n@2x.png"
                                 className="w-8 h-8 my-1"
+                                alt="night"
                             />
                         ) : (
                             <img
                                 src="https://openweathermap.org/img/wn/01d@2x.png"
                                 className="w-8 h-8 my-1"
+                                alt="day"
                             />
                         )}
 

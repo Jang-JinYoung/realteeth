@@ -1,6 +1,4 @@
-import { QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
-import { queryClient } from "./providers/queryClient";
 import WeatherPage from "./pages/WeatherPage";
 import { Route, Routes } from "react-router-dom";
 

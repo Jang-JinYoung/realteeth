@@ -1,9 +1,6 @@
-import { useState } from "react";
 import WeatherMetaItem from "../atoms/WeatherMetaItem";
 import FavoriteIcon from "../atoms/FavoriteIcon";
 import { IFavoriteLocation } from "../types/locationType";
-import Skeleton from "./Skeleton";
-
 interface IProps {
     variant?: "main" | "card";
     favorite?: boolean;
