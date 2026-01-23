@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { fetchWeatherOneCall, getLatLonByLocation } from "../api/weatherAPI";
-import { useQuery } from "@tanstack/react-query";
+import {
+    fetchTimeMachine,
+    fetchWeatherOneCall,
+    getLatLonByLocation,
+} from "../api/weatherAPI";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import useGeolocation from "../hooks/useGeolocation";
 import LocationSearch from "../components/LocationSearch";
 import DailyWeather from "../components/DailyWeather";
-
-const nowHour = new Date().getHours();
+import FavoriteLocation from "../components/FavoriteLocation";
+import { IFavoriteLocation } from "../types/locationType";
+import { useFavoriteStore } from "../stores/favoriteStore";
+import HoulyWeather from "../components/HourlyWeather";
+import DailyWeatherSkeleton from "../components/Skeleton/DailyWeatherSkeleton";
+import HoulyWeatherSkeleton from "../components/Skeleton/HoulyWeatherSkeleton";
+import { useNavigate } from "react-router-dom";
 
 const WeatherPage = () => {
+
+    console.log(process.env.REACT_APP_OPENWEATHER_API_KEY);
+
+    const navigate = useNavigate();
+    
     /* 사용자의 현재 위치 정보 */
     const {
         position,
@@ -23,8 +37,48 @@ const WeatherPage = () => {
         enabled: !!position?.lat && !!position?.lon,
     });
 
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    const todayBase = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        0,
+        0,
+        0,
+    );
+
+    const pastHourlyTimestamps = Array.from({ length: currentHour }, (_, i) =>
+        Math.floor(
+            new Date(
+                todayBase.getFullYear(),
+                todayBase.getMonth(),
+                todayBase.getDate(),
+                i,
+                0,
+                0,
+            ).getTime() / 1000,
+        ),
+    );
+
+    const pastHourlyQueries = useQueries({
+        queries: pastHourlyTimestamps.map((dt) => ({
+            queryKey: ["weather-timemachine", position?.lat, position?.lon, dt],
+            queryFn: () => fetchTimeMachine(position?.lat, position?.lon, dt),
+            enabled: !!position?.lat && !!position?.lon,
+            staleTime: 1000 * 60 * 10,
+        })),
+    });
+
+    const pastHourlyData = pastHourlyQueries
+        .filter((q) => q.data)
+        .flatMap((q) => q.data!.data[0] ?? []);
+
+
     // 지역 선택
     const [locationName, setLocationName] = useState<string | null>(null);
+
     /* 지역 검색 API */
     const {
         data: locationData,
@@ -33,13 +87,11 @@ const WeatherPage = () => {
     } = useQuery({
         queryKey: [locationName],
         queryFn: () => getLatLonByLocation(locationName),
-        // queryFn: () => getLatLonByLocation("서울특별시 종로구 청운동")
         enabled: !!locationName,
     });
 
     useEffect(() => {
         if (!isLocationLoading && locationData) {
-            console.log(locationData[0]);
             setPosition({
                 lat: locationData[0].lat,
                 lon: locationData[0].lon,
@@ -48,64 +100,88 @@ const WeatherPage = () => {
     }, [locationData]);
 
     const locationSearchCallback = (locationName: string) => {
-        const getLastWord = (text: string) => {
-            const parts = text.trim().split(" ");
-            return parts[parts.length - 1];
+        // 지역이름
+        const getSearchKeywort = (text: string) => {
+            const parts = text.trim().split(" ").reverse();
+            return parts.join(",");
         };
 
-        setLocationName(getLastWord(locationName));
+        setLocationName(getSearchKeywort(locationName));
+
+        // 좋아요 갱신
+        setFavorite(false);
     };
+
+    const { favorites, toggleFavorite, removeFavorite } = useFavoriteStore();
+
+    const [favorite, setFavorite] = useState(false);
+
+    const favoriteCallback = (
+        d: IFavoriteLocation,
+        variant: "main" | "card",
+    ) => {
+        if (variant === "main") {
+            setFavorite((prev) => !prev);
+
+            toggleFavorite(d);
+        } else {
+            removeFavorite(d.locationName);
+        }
+    };
+
+    const onFavortieLocationClick = () => {
+        navigate(`/weather/${position?.lat}/${position?.lon}`);
+    }
 
     if (loading) return <div>위치 확인 중...</div>;
     if (useGeolocationError) return <div>위치 정보를 가져올 수 없습니다.</div>;
     if (!position) return <div>123</div>;
 
-    if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
-    if (!data) return <div>해당 장소의 정보가 제공되지 않습니다.</div>;
 
     return (
-        <div className="w-full">
-            <div className="mx-auto max-w-4xl px-4 border border-slate-200 rounded-2xl bg-white">
-                <LocationSearch
-                    locationSearchCallback={locationSearchCallback}
-                />
+        <div>
+            <div className="w-full">
+                <div className="mx-auto max-w-4xl px-4 border border-slate-200 rounded-2xl bg-white">
+                    <LocationSearch
+                        locationSearchCallback={locationSearchCallback}
+                    />
 
-                <DailyWeather
-                    nowTemp={data.current.temp}
-                    minTemp={data.daily[0].temp.min}
-                    maxTemp={data.daily[0].temp.max}
-                />
+                    {isLoading && (
+                        <>
+                            <DailyWeatherSkeleton />
+                            <HoulyWeatherSkeleton />
+                        </>
+                    )}
 
-                <section className="mt-10">
-                    <ul className="flex gap-4 overflow-x-auto pb-4">
-                        {data.hourly.map((h) => {
-                            const hour = new Date(h.dt * 1000).getHours();
+                    {/* 2️⃣ 데이터 없음 */}
+                    {!isLoading && !data && (
+                        // <NoData message="날씨 데이터를 불러올 수 없습니다." />
+                        <div>nodata</div>
+                    )}
 
-                            return (
-                                <li
-                                    key={h.dt}
-                                    className="min-w-[72px] rounded-xl bg-slate-100
-                                       flex flex-col items-center py-3"
-                                >
-                                    <span className="text-sm font-semibold text-black">
-                                        {Math.round(h.temp)}°
-                                    </span>
+                    {/* 3️⃣ 정상 데이터 */}
+                    {!isLoading && data && (
+                        <>
+                            <DailyWeather
+                                locationName={`${data.documents[0].address.region_2depth_name} ${data.documents[0].address.region_3depth_name}`}
+                                favorite={favorite}
+                                favoriteCallback={favoriteCallback}
+                                nowTemp={data.current.temp}
+                                minTemp={data.daily[0].temp.min}
+                                maxTemp={data.daily[0].temp.max}
+                            />
 
-                                    <img
-                                        src="https://openweathermap.org/img/wn/01d@2x.png"
-                                        className="w-8 h-8 my-1"
-                                    />
-
-                                    <span className="text-xs text-slate-500">
-                                        {hour}시
-                                    </span>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </section>
+                            <HoulyWeather houlyData={[...pastHourlyData ,...data.hourly]} />
+                        </>
+                    )}
+                </div>
             </div>
+            <FavoriteLocation
+                favoriteLocation={favorites}
+                favoriteCallback={favoriteCallback}
+                onFavortieLocationClick={onFavortieLocationClick}
+            />
         </div>
     );
 };

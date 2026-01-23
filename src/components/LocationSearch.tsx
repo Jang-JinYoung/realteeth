@@ -1,19 +1,32 @@
 import { useQuery } from "@tanstack/react-query";
 import { districtData } from "../data/korea_districts";
 import { getLatLonByLocation } from "../api/weatherAPI";
-import { useMemo, useState } from "react";
-
+import { useEffect, useMemo, useRef, useState } from "react";
+import Skeleton from "./Skeleton";
 
 interface IProps {
     locationSearchCallback: (locationName: string) => void;
 }
 
-const LocationSearch = ({
-    locationSearchCallback
-}: IProps) => {
+const LocationSearch = ({ locationSearchCallback }: IProps) => {
+    const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
     const [query, setQuery] = useState("");
     const [selected, setSelected] = useState<string | null>(null);
+
+    const [activeIndex, setActiveIndex] = useState<number>(-1);
+
+    useEffect(() => {
+        if (activeIndex < 0) return;
+
+        const el = itemRefs.current[activeIndex];
+        if (el) {
+            el.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth", // 원하면 제거 가능
+            });
+        }
+    }, [activeIndex]);
 
     const suggestions = useMemo(() => {
         if (!query) return [];
@@ -76,6 +89,31 @@ const LocationSearch = ({
                     onChange={(e) => {
                         setQuery(e.target.value);
                         setSelected(null);
+                        setActiveIndex(-1);
+                    }}
+                    onKeyDown={(e) => {
+                        if (suggestions.length === 0) return;
+
+                        if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            setActiveIndex((prev) =>
+                                prev < suggestions.length - 1 ? prev + 1 : 0,
+                            );
+                        }
+                        if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            setActiveIndex((prev) =>
+                                prev > 0 ? prev - 1 : suggestions.length - 1,
+                            );
+                        }
+                        if (e.key === "Enter" && activeIndex >= 0) {
+                            e.preventDefault();
+                            const selectedItem = suggestions[activeIndex];
+
+                            setQuery(selectedItem.replace(/-/g, " "));
+                            setSelected(selectedItem);
+                            locationSearchCallback(selectedItem);
+                        }
                     }}
                 />
             </div>
@@ -83,19 +121,27 @@ const LocationSearch = ({
             {/* 자동완성 */}
             {suggestions.length > 0 && !selected && (
                 <ul
-                    className="absolute left-0 right-0 mt-2
+                    className="absolute left-0 right-0
                                rounded-xl border border-slate-200
                                bg-white shadow-lg
                                max-h-64 overflow-y-auto z-10"
                 >
-                    {suggestions.map((item) => (
+                    {suggestions.map((item, index) => (
                         <li
                             key={item}
-                            className="px-4 py-2 text-sm cursor-pointer hover:bg-slate-100"
+                            ref={(el) => {
+                                itemRefs.current[index] = el;
+                            }}
+                            className={`
+                                px-4 py-2 text-sm cursor-pointer
+                                ${index === activeIndex ? "bg-slate-100" : ""}
+                                hover:bg-slate-100
+                            `}
+                            onMouseEnter={() => setActiveIndex(index)}
                             onClick={() => {
                                 setQuery(item.replace(/-/g, " "));
                                 setSelected(item);
-                                locationSearchCallback(item)
+                                locationSearchCallback(item);
                             }}
                         >
                             {highlightKeyword(item.replace(/-/g, " "), query)}

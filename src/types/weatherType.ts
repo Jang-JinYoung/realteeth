@@ -1,6 +1,17 @@
-// src/shared/api/fetchWeatherOneCall.ts
+export interface IHoulyWeather {
+    dt: number;
+    temp: number;
+    feels_like: number;
+    weather: {
+        id: number;
+        main: string;
+        description: string;
+        icon: string;
+    }[];
+    pop: number;
+}
 
-export type WeatherOneCallResponse = {
+export interface WeatherOneCallResponse  {
     lat: number;
     lon: number;
     timezone: string;
@@ -25,33 +36,21 @@ export type WeatherOneCallResponse = {
             icon: string;
         }[];
     };
-    hourly: {
-        dt: number;
-        temp: number;
-        feels_like: number;
-        weather: {
-            id: number;
-            main: string;
-            description: string;
-            icon: string;
-        }[];
-        pop: number;
-    }[];
+    hourly: IHoulyWeather[]
     daily: {
         temp: {
-            min: number,
+            min: number;
             max: number;
-        }
+        };
     }[];
 };
 
-
 export type WindDirectionTypes =
-  | '북'
-  | '북동'
-  | '동'
-  | '남동'
-  | '남'
-  | '남서'
-  | '서'
-  | '북서';
+    | "북"
+    | "북동"
+    | "동"
+    | "남동"
+    | "남"
+    | "남서"
+    | "서"
+    | "북서";
