@@ -1,30 +1,29 @@
-import { KakaoLocationApiResponse, LocationApiResponse } from "../types/locationType";
+import {
+    KakaoLocationApiResponse,
+    LocationApiResponse,
+} from "../types/locationType";
 import { WeatherOneCallResponse } from "../types/weatherType";
 
-export const getLatLonByLocation = async (q: string | null) => {
-    if (!q) return;
-
+export const getLatLonByLocation = async (q: string): Promise<LocationApiResponse> => {
     const res = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct` +
-            `?q=${encodeURIComponent(q)}` +
-            `&limit=1` +
-            `&lang=kr` +
-            `&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}`,
+        `https://dapi.kakao.com/v2/local/search/address.json?query=${q}`, {
+            headers: {
+                Authorization: `KakaoAK ${process.env.REACT_APP_KAKAO_API_KEY}`,
+            },
+        }
     );
 
     if (!res.ok) {
-        throw new Error("Weather API request failed");
+        // throw { code: 100, message: "지역 검색 좌표가 없습니다.", data };
     }
 
     return res.json() as Promise<LocationApiResponse>;
 };
 
-
 export const fetchWeatherOneCall = async (
     lat: number | undefined,
     lon: number | undefined,
-): Promise<WeatherOneCallResponse & KakaoLocationApiResponse>  => {
-    
+): Promise<WeatherOneCallResponse & KakaoLocationApiResponse> => {
     const weatherUrl =
         `https://api.openweathermap.org/data/3.0/onecall` +
         `?lat=${lat}` +
@@ -33,7 +32,6 @@ export const fetchWeatherOneCall = async (
         `&units=metric` +
         `&lang=kr` +
         `&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}`;
-
 
     const kakaoUrl =
         `https://dapi.kakao.com/v2/local/geo/coord2address.json` +
@@ -62,8 +60,8 @@ export const fetchWeatherOneCall = async (
     ]);
 
     return {
-        ...weather,     // current, hourly, daily 그대로 사용
-        ...address,        // 카카오 주소 정보
+        ...weather, // current, hourly, daily 그대로 사용
+        ...address, // 카카오 주소 정보
     };
 };
 
@@ -83,7 +81,7 @@ export const fetchTimeMachine = async (
     );
 
     if (!res.ok) {
-        throw new Error('TimeMachine fetch failed');
+        throw new Error("TimeMachine fetch failed");
     }
 
     return res.json();

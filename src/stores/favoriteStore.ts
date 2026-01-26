@@ -1,15 +1,18 @@
-import { create } from 'zustand';
-import { IFavoriteLocation } from '../types/locationType';
+import { create } from "zustand";
+import { GeoPosition, IFavoriteLocation } from "../types/locationType";
+
+export interface IFavortieLocationStore extends GeoPosition, IFavoriteLocation {};
 
 interface FavoriteStore {
-    favorites: IFavoriteLocation[];
+    favorites: IFavortieLocationStore[];
 
-    addFavorite: (location: IFavoriteLocation) => void;
+    addFavorite: (location: IFavortieLocationStore) => void;
     removeFavorite: (locationName: string) => void;
-    toggleFavorite: (location: IFavoriteLocation) => void;
+    toggleFavorite: (location: IFavortieLocationStore) => void;
+    updateAlias: (locationName: string, alias: string) => void;
     clearFavorites: () => void;
+    getFavoirteByLocationName: (locationName: string) => IFavortieLocationStore | undefined;
 }
-
 export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
     favorites: [],
 
@@ -47,10 +50,26 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
                       (item) => item.locationName !== location.locationName,
                   )
                 : favorites.length < 6
-                ? [...favorites, location]
-                : favorites,
+                  ? [...favorites, location]
+                  : favorites,
         });
     },
 
+    updateAlias: (locationName, alias) =>
+        set((state) => ({
+            favorites: state.favorites.map((item) =>
+                item.locationName === locationName ? { ...item, alias } : item,
+            ),
+        })),
+
     clearFavorites: () => set({ favorites: [] }),
+
+
+    getFavoirteByLocationName: (locationName) => {
+        const { favorites } = get();
+
+        return favorites.find(
+            (item) => item.locationName === locationName,
+        );
+    },
 }));

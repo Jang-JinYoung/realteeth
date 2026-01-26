@@ -1,15 +1,19 @@
-export type LocationApiResponse = {
-    country: string;
+
+export interface GeoPosition {
     lat: number;
     lon: number;
-    name: string;
-    local_name: {
-        ko: string;
-        en: string;
-    };
-}[];
+}
 
-export type KakaoLocationApiResponse = {
+export interface LocationApiResponse {
+    documents: {
+        address: {
+            x: number,
+            y: number;
+        }
+    }[];
+};
+
+export interface KakaoLocationApiResponse {
     documents: {
         address: {
             region_1depth_name: string;
@@ -21,6 +25,7 @@ export type KakaoLocationApiResponse = {
 
 export interface IFavoriteLocation {
     locationName: string;
+    alias?: string;
     nowTemp: number;
     minTemp: number;
     maxTemp: number;

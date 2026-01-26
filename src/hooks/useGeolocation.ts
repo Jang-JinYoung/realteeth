@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-
-interface GeoPosition {
-    lat: number;
-    lon: number;
-}
+import { GeoPosition } from "../types/locationType";
 
 interface GeoError {
     message: string;

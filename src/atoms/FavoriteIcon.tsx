@@ -10,7 +10,7 @@ const FavoriteIcon = ({ favorite }: IProps) => {
             fill={favorite ? "#facc15" : "none"}
             stroke={favorite ? "#facc15" : "#94a3b8"}
             strokeWidth={2}
-            className="w-6 h-6 transition-colors"
+            className="w-5 h-5 transition-colors"
         >
             <path
                 strokeLinecap="round"

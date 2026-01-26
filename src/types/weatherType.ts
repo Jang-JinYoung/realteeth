@@ -11,9 +11,7 @@ export interface IHoulyWeather {
     pop: number;
 }
 
-export interface WeatherOneCallResponse  {
-    lat: number;
-    lon: number;
+export interface WeatherOneCallResponse  extends Geolocation{
     timezone: string;
     timezone_offset: number;
     current: {

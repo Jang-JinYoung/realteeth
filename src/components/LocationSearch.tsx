@@ -105,6 +105,7 @@ const LocationSearch = ({ locationSearchCallback }: IProps) => {
                         }
                         if (e.key === "Enter" && activeIndex >= 0) {
                             e.preventDefault();
+                            setActiveIndex(-1);
                             const selectedItem = suggestions[activeIndex];
 
                             setQuery(selectedItem.replace(/-/g, " "));
@@ -134,7 +135,6 @@ const LocationSearch = ({ locationSearchCallback }: IProps) => {
                                 ${index === activeIndex ? "bg-slate-100" : ""}
                                 hover:bg-slate-100
                             `}
-                            onMouseEnter={() => setActiveIndex(index)}
                             onClick={() => {
                                 setQuery(item.replace(/-/g, " "));
                                 setSelected(item);
