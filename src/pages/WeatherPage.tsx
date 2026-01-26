@@ -9,9 +9,10 @@ import { useEffect, useState } from "react";
 import DailyWeather from "../components/DailyWeather";
 import useTodayWeatherWithPastHourly from "../hooks/useTodayWeatherWithPastHourly";
 import HourlyWeather from "../components/HourlyWeather";
+import { NoData } from "../components/NoData";
+import LocationIcon from "../atoms/LocationIcon";
 
 const WeatherPage = () => {
-    const isLoading = false;
 
     const { locationName } = useParams();
     const decodedLocationName = decodeURIComponent(locationName ?? "");
@@ -22,6 +23,7 @@ const WeatherPage = () => {
 
     const {
         weather,
+        location,
         pastHourlyData,
         isWeatherLoading,
         isPastHourlyLoading,
@@ -38,12 +40,12 @@ const WeatherPage = () => {
         }
     }, [decodedLocationName]);
 
-    if (!data) return <div>잘못된 접근입니다.</div>;
+    if (!pastHourlyData || !weather) return <div>잘못된 접근입니다.</div>;
 
     return (
-        <div className="w-full">
+        <div className="w-full mt-10">
             <div className="mx-auto max-w-4xl px-4 border border-slate-200 rounded-2xl bg-white ">
-                {isLoading && (
+                {!(isWeatherLoading || isPastHourlyLoading)  && (
                     <>
                         <DailyWeatherSkeleton />
                         <HoulyWeatherSkeleton />
@@ -51,32 +53,27 @@ const WeatherPage = () => {
                 )}
 
                 <div className="mt-10">
+                    <div className="p-6 pb-0 flex items-center justify-between text-slate-600 text-xs">
+                        <div className="flex items-center gap-2">
+                            <LocationIcon />
+                            <span>{location} {}</span>
+                        </div>
+                    </div>
                     <DailyWeather
-                        nowTemp={data.nowTemp}
-                        minTemp={data.minTemp}
-                        maxTemp={data.maxTemp}
+                        nowTemp={weather.current.temp}
+                        minTemp={weather.daily[0].temp.min}
+                        maxTemp={weather.daily[0].temp.max}
                     />
-
-                    {isWeatherLoading || isPastHourlyLoading ? (
-                        <HourlyWeather houlyData={[...pastHourlyData]} />
-                    ) : (
-                        <HourlyWeather houlyData={[...pastHourlyData]} />
-                    )}
                 </div>
-                {/* {!isLoading && !data && (
-                // <NoData message="날씨 데이터를 불러올 수 없습니다." />
-                <div>nodata</div>
-            )}
+                {!(isWeatherLoading || isPastHourlyLoading) && !data && (
+                    <NoData message="날씨 데이터를 불러올 수 없습니다." />
+                )}
 
-            
-            {!isLoading && data && (
-                <>
-
-                    <HoulyWeather
-                        houlyData={[...pastHourlyData, ...data.hourly]}
+                {!(isWeatherLoading || isPastHourlyLoading) && data && (
+                    <HourlyWeather
+                        houlyData={[...pastHourlyData, ...weather.hourly]}
                     />
-                </>
-            )} */}
+                )}
             </div>
         </div>
     );

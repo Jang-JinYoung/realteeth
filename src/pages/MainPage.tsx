@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from "react";
-import {
-    fetchTimeMachine,
-    fetchWeatherOneCall,
-    getLatLonByLocation,
-} from "../api/weatherAPI";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { getLatLonByLocation } from "../api/weatherAPI";
+import { useQuery } from "@tanstack/react-query";
 import useGeolocation from "../hooks/useGeolocation";
 import LocationSearch from "../components/LocationSearch";
 import DailyWeather from "../components/DailyWeather";
 import FavoriteLocation from "../components/FavoriteLocation";
-import { IFavoriteLocation } from "../types/locationType";
+import {} from "../types/locationType";
 import { useFavoriteStore } from "../stores/favoriteStore";
-import HoulyWeather from "../components/HourlyWeather";
 import DailyWeatherSkeleton from "../components/Skeleton/DailyWeatherSkeleton";
 import HoulyWeatherSkeleton from "../components/Skeleton/HoulyWeatherSkeleton";
 import { useNavigate } from "react-router-dom";
 import LocationIcon from "../atoms/LocationIcon";
-import { onecallData } from "../data/onecall";
-import { timemachineData } from "../data/timemachine";
 import { NoData } from "../components/NoData";
 import FavoriteIcon from "../atoms/FavoriteIcon";
-import AliasEditModal from "../components/AliasEditModal";
 import useTodayWeatherWithPastHourly from "../hooks/useTodayWeatherWithPastHourly";
+import HourlyWeather from "../components/HourlyWeather";
 
 const MainPage = () => {
     const navigate = useNavigate();
@@ -45,7 +38,6 @@ const MainPage = () => {
         lat: position?.lat ?? 0,
         lon: position?.lon ?? 0,
     });
-
 
     const [locationName, setLocationName] = useState<string>("");
 
@@ -105,19 +97,15 @@ const MainPage = () => {
     };
 
     if (loading) return <div>위치 확인 중...</div>;
-    if (useGeolocationError || !position) return <div>위치 정보를 가져올 수 없습니다.</div>;
+    if (useGeolocationError || !position)
+        return <div>위치 정보를 가져올 수 없습니다.</div>;
 
     if (locationError || error) return <div>지역 검색 오류</div>;
 
     return (
         <div>
             <div className="w-full">
-
-                {
-                    loading ?? (
-                        <div>위치 정보 확인 중입니다...</div>
-                    )
-                }
+                {loading ?? <div>위치 정보 확인 중입니다...</div>}
                 <div className="mx-auto max-w-4xl px-4 border border-slate-200 rounded-2xl bg-white">
                     <LocationSearch
                         locationSearchCallback={locationSearchCallback}
@@ -138,7 +126,6 @@ const MainPage = () => {
                     {!(isWeatherLoading || isPastHourlyLoading) && weather && (
                         <>
                             <div className="p-6 pb-0 flex items-center justify-between text-slate-600 text-xs">
-                                {/* 좌측 */}
                                 <div className="flex items-center gap-2">
                                     <LocationIcon />
                                     <span>{location}</span>
@@ -157,7 +144,7 @@ const MainPage = () => {
                                 maxTemp={weather.daily[0].temp.max}
                             />
 
-                            <HoulyWeather
+                            <HourlyWeather
                                 houlyData={[
                                     ...pastHourlyData,
                                     ...weather.hourly,
