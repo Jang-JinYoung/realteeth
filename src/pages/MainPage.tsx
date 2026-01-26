@@ -5,7 +5,6 @@ import useGeolocation from "../hooks/useGeolocation";
 import LocationSearch from "../components/LocationSearch";
 import DailyWeather from "../components/DailyWeather";
 import FavoriteLocation from "../components/FavoriteLocation";
-import {} from "../types/locationType";
 import { useFavoriteStore } from "../stores/favoriteStore";
 import DailyWeatherSkeleton from "../components/Skeleton/DailyWeatherSkeleton";
 import HoulyWeatherSkeleton from "../components/Skeleton/HoulyWeatherSkeleton";
@@ -101,8 +100,6 @@ const MainPage = () => {
     if (useGeolocationError || !position)
         return <div>위치 정보를 가져올 수 없습니다.</div>;
 
-    if (locationError || error) return <div>지역 검색 오류</div>;
-
     return (
         <div>
             <div className="w-full">
@@ -112,13 +109,12 @@ const MainPage = () => {
                         locationSearchCallback={locationSearchCallback}
                     />
 
-                    {isWeatherLoading ||
-                        (isPastHourlyLoading && (
-                            <>
-                                <DailyWeatherSkeleton />
-                                <HoulyWeatherSkeleton />
-                            </>
-                        ))}
+                    {(isWeatherLoading || isPastHourlyLoading) && (
+                        <>
+                            <DailyWeatherSkeleton />
+                            <HoulyWeatherSkeleton />
+                        </>
+                    )}
 
                     {!(isWeatherLoading || isPastHourlyLoading) && !weather && (
                         <NoData message="날씨 데이터를 불러올 수 없습니다." />
