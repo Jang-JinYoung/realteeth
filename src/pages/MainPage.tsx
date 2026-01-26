@@ -60,6 +60,7 @@ const MainPage = () => {
                 lon: locationData.documents[0].address.x,
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLocationSearchSuccess, locationData]);
 
     const locationSearchCallback = (locationName: string) => {
