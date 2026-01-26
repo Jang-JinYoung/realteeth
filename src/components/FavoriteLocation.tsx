@@ -1,11 +1,8 @@
 import { useState } from "react";
 import EditIcon from "../atoms/EditIcon";
 import FavoriteIcon from "../atoms/FavoriteIcon";
-import LocationIcon from "../atoms/LocationIcon";
-import { IFavoriteLocation } from "../types/locationType";
 import AliasEditModal from "./AliasEditModal";
 import DailyWeather from "./DailyWeather";
-import { useFavoriteStore } from "../stores/favoriteStore";
 
 interface IProps {
     favoriteLocation: any[];
