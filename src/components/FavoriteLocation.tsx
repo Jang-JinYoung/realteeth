@@ -37,7 +37,7 @@ const FavoriteLocation = ({
             />
             <div className="max-w-4xl mx-auto">
                 <h2 className="mb-3 text-sm font-medium text-slate-600">
-                    즐겨찾기 지역
+                    즐겨찾기 지역 (최대 6개)
                 </h2>
 
                 <ul

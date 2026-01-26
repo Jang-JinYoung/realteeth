@@ -79,6 +79,8 @@ const MainPage = () => {
     const [favorite, setFavorite] = useState<boolean>(false);
 
     const onFavoriteClick = () => {
+
+        if(favorites.length > 6) return;
         setFavorite((prev) => !prev);
 
         toggleFavorite({
