@@ -1,7 +1,4 @@
 import WeatherMetaItem from "../atoms/WeatherMetaItem";
-import FavoriteIcon from "../atoms/FavoriteIcon";
-import { IFavoriteLocation } from "../types/locationType";
-import LocationIcon from "../atoms/LocationIcon";
 interface IProps {
     variant?: "main" | "card";
     nowTemp: number;

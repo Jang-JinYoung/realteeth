@@ -53,7 +53,7 @@ const useTodayWeatherWithPastHourly = (position?: GeoPosition) => {
 
     return {
         weather: weatherQuery.data,
-        location: `${weatherQuery.data?.documents[0].address.region_1depth_name}` + ` ${weatherQuery.data?.documents[0].address.region_2depth_name}` + ` ${weatherQuery.data?.documents[0].address.region_3depth_name}`,
+        location: `${weatherQuery.data?.documents[0].address.region_1depth_name} ${weatherQuery.data?.documents[0].address.region_2depth_name} ${weatherQuery.data?.documents[0].address.region_3depth_name}`,
         isWeatherLoading: weatherQuery.isLoading,
 
         pastHourlyData,

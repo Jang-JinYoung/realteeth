@@ -38,9 +38,14 @@ const WeatherPage = () => {
             const favorite = getFavoirteByLocationName(decodedLocationName);
             setData(favorite);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [decodedLocationName]);
 
+
+
     if (!pastHourlyData || !weather) return <div>잘못된 접근입니다.</div>;
+
+    if(error) return <div>error</div>
 
     return (
         <div className="w-full mt-10">
