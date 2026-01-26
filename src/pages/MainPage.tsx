@@ -32,7 +32,6 @@ const MainPage = () => {
         pastHourlyData,
         isWeatherLoading,
         isPastHourlyLoading,
-        error,
     } = useTodayWeatherWithPastHourly({
         lat: position?.lat ?? 0,
         lon: position?.lon ?? 0,
@@ -97,7 +96,7 @@ const MainPage = () => {
     };
 
     if (loading) return <div>위치 확인 중...</div>;
-    if (useGeolocationError || !position)
+    if (useGeolocationError || !position || locationError)
         return <div>위치 정보를 가져올 수 없습니다.</div>;
 
     return (
